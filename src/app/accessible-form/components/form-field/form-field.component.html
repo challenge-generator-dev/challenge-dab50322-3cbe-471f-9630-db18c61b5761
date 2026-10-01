@@ -1,0 +1,66 @@
+<div class="form-field-container" [class.form-field-focused]="isFocused" [class.form-field-invalid]="showError" [class.form-field-disabled]="disabled" [class.form-field-readonly]="readonly">
+  <mat-form-field appearance="outline" class="accessible-form-field">
+    <mat-label>{{ label }}</mat-label>
+    
+    <input
+      matInput
+      [id]="inputId"
+      [type]="inputType"
+      [placeholder]="placeholder"
+      [formControl]="control"
+      [attr.aria-label]="label"
+      [attr.aria-describedby]="ariaDescribedBy"
+      [attr.aria-required]="required"
+      [attr.aria-invalid]="showError"
+      [attr.aria-disabled]="disabled"
+      [attr.aria-readonly]="readonly"
+      [attr.autocomplete]="type === 'email' ? 'email' : type === 'tel' ? 'tel' : 'off'"
+      [attr.inputmode]="type === 'email' ? 'email' : type === 'tel' ? 'tel' : type === 'url' ? 'url' : 'text'"
+      [disabled]="disabled"
+      [readonly]="readonly"
+      (focus)="onInputFocus()"
+      (blur)="onInputBlur()"
+      (input)="onInputChange($any($event.target).value)"
+      #inputElement
+    />
+    
+    <button
+      *ngIf="type === 'password'"
+      mat-icon-button
+      matSuffix
+      type="button"
+      [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+      [attr.aria-pressed]="showPassword"
+      (click)="togglePasswordVisibility()"
+      [disabled]="disabled"
+    >
+      <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+    </button>
+    
+    <mat-hint
+      *ngIf="hint && !showError"
+      [id]="hintId"
+      [attr.aria-hidden]="false"
+    >
+      {{ hint }}
+    </mat-hint>
+    
+    <mat-error
+      *ngIf="showError"
+      [id]="errorId"
+      role="alert"
+      aria-live="assertive"
+    >
+      <span *ngFor="let errorKey of getErrorKeys()">{{ getErrorMessage(errorKey) }}</span>
+    </mat-error>
+    
+    <mat-icon
+      *ngIf="control.valid && control.dirty && !disabled"
+      matSuffix
+      class="validation-icon success"
+      aria-hidden="true"
+    >
+      check_circle
+    </mat-icon>
+  </mat-form-field>
+</div>

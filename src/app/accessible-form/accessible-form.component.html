@@ -1,0 +1,175 @@
+<div class="accessible-form-container" role="main" aria-labelledby="form-title">
+  <header class="form-header">
+    <h1 id="form-title" class="form-title">Formulario de Registro Accesible</h1>
+    <p class="form-description">
+      Completa los siguientes campos para crear tu cuenta. Todos los campos marcados con asterisco (*) son obligatorios.
+    </p>
+  </header>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-content" aria-describedby="form-instructions">
+    <div id="form-instructions" class="visually-hidden">
+      Formulario con 7 campos. Usa tab para navegar entre campos. Los errores se anuncian automáticamente.
+    </div>
+
+    <div #formFieldsContainer class="form-fields-grid" role="group" aria-label="Campos del formulario">
+      @for (field of formFields; track trackByFieldId($index, field)) {
+        <app-form-field
+          [field]="field"
+          [control]="getFieldControl(field.config.id)"
+          [errorMessage]="getErrorMessage(field.config.id)"
+          [attr.aria-describedby]="field.config.id + '-help'"
+        >
+          <ng-container [ngSwitch]="field.config.type">
+            <ng-container *ngSwitchCase="'text'">
+              <input
+                matInput
+                [id]="field.config.id"
+                [formControlName]="field.config.id"
+                [type]="field.config.type"
+                [placeholder]="field.config.placeholder || ''"
+                [attr.aria-required]="field.config.required"
+                [attr.autocomplete]="field.config.autocomplete"
+                [attr.maxlength]="field.config.maxLength"
+                [attr.aria-describedby]="field.config.id + '-error'"
+              />
+            </ng-container>
+            <ng-container *ngSwitchCase="'email'">
+              <input
+                matInput
+                [id]="field.config.id"
+                [formControlName]="field.config.id"
+                [type]="field.config.type"
+                [placeholder]="field.config.placeholder || ''"
+                [attr.aria-required]="field.config.required"
+                [attr.autocomplete]="field.config.autocomplete"
+                [attr.aria-describedby]="field.config.id + '-error'"
+              />
+            </ng-container>
+            <ng-container *ngSwitchCase="'password'">
+              <input
+                matInput
+                [id]="field.config.id"
+                [formControlName]="field.config.id"
+                [type]="field.config.type"
+                [placeholder]="field.config.placeholder || ''"
+                [attr.aria-required]="field.config.required"
+                [attr.autocomplete]="field.config.autocomplete"
+                [attr.aria-describedby]="field.config.id + '-error'"
+              />
+            </ng-container>
+            <ng-container *ngSwitchCase="'tel'">
+              <input
+                matInput
+                [id]="field.config.id"
+                [formControlName]="field.config.id"
+                [type]="field.config.type"
+                [placeholder]="field.config.placeholder || ''"
+                [attr.aria-required]="field.config.required"
+                [attr.autocomplete]="field.config.autocomplete"
+                [attr.inputmode]="'tel'"
+                [attr.aria-describedby]="field.config.id + '-error'"
+              />
+            </ng-container>
+            <ng-container *ngSwitchCase="'url'">
+              <input
+                matInput
+                [id]="field.config.id"
+                [formControlName]="field.config.id"
+                [type]="field.config.type"
+                [placeholder]="field.config.placeholder || ''"
+                [attr.aria-required]="field.config.required"
+                [attr.autocomplete]="field.config.autocomplete"
+                [attr.inputmode]="'url'"
+                [attr.aria-describedby]="field.config.id + '-error'"
+              />
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+              <input
+                matInput
+                [id]="field.config.id"
+                [formControlName]="field.config.id"
+                type="text"
+                [placeholder]="field.config.placeholder || ''"
+                [attr.aria-required]="field.config.required"
+                [attr.autocomplete]="field.config.autocomplete"
+              />
+            </ng-container>
+          </ng-container>
+          <mat-hint [id]="field.config.id + '-help'" *ngIf="field.config.maxLength">
+            {{ form.get(field.config.id)?.value?.length || 0 }} / {{ field.config.maxLength }}
+          </mat-hint>
+          <mat-error [id]="field.config.id + '-error'" role="alert" aria-live="polite">
+            {{ getErrorMessage(field.config.id) }}
+          </mat-error>
+        </app-form-field>
+      }
+    </div>
+
+    <div class="form-actions" role="group" aria-label="Acciones del formulario">
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="isSubmitting"
+        [attr.aria-disabled]="isSubmitting"
+        class="submit-button"
+      >
+        @if (isSubmitting) {
+          <mat-spinner diameter="20" aria-label="Enviando formulario"></mat-spinner>
+          <span class="button-text">Enviando...</span>
+        } @else {
+          <mat-icon aria-hidden="true">send</mat-icon>
+          <span class="button-text">Enviar</span>
+        }
+      </button>
+
+      <button
+        mat-stroked-button
+        type="button"
+        (click)="onReset()"
+        [disabled]="isSubmitting"
+        class="reset-button"
+      >
+        <mat-icon aria-hidden="true">refresh</mat-icon>
+        <span class="button-text">Reiniciar</span>
+      </button>
+    </div>
+
+    @if (errorMessage) {
+      <div
+        class="error-summary"
+        role="alert"
+        aria-live="assertive"
+        aria-describedby="error-summary-title"
+      >
+        <mat-icon aria-hidden="true">error_outline</mat-icon>
+        <div class="error-content">
+          <h2 id="error-summary-title" class="error-title">Error en el formulario</h2>
+          <p>{{ errorMessage }}</p>
+        </div>
+      </div>
+    }
+
+    @if (submittedSuccessfully) {
+      <div
+        class="success-summary"
+        role="status"
+        aria-live="polite"
+        aria-describedby="success-summary-title"
+      >
+        <mat-icon aria-hidden="true">check_circle</mat-icon>
+        <div class="success-content">
+          <h2 id="success-summary-title" class="success-title">¡Registro exitoso!</h2>
+          <p>Tu cuenta ha sido creada correctamente. Recibirás un correo de confirmación.</p>
+        </div>
+      </div>
+    }
+  </form>
+
+  <footer class="form-footer">
+    <p class="accessibility-notice">
+      <mat-icon aria-hidden="true">accessibility_new</mat-icon>
+      <span>Este formulario cumple con los estándares WCAG 2.1 nivel AA de accesibilidad.</span>
+    </p>
+  </footer>
+</div>
